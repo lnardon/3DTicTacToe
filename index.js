@@ -12,7 +12,7 @@ const renderer = new THREE.WebGLRenderer({
   canvas: document.getElementById("canvas"),
   antialias: true,
 });
-renderer.setClearColor(0xe1e1e1);
+renderer.setClearColor(0x070707);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -23,7 +23,10 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   3000
 );
-camera.position.z = 100;
+camera.position.x = 50;
+camera.position.y = 50;
+camera.position.z = 75;
+
 window.addEventListener(
   "resize",
   function () {
@@ -38,8 +41,17 @@ window.addEventListener(
 const controls = new OrbitControls(camera, renderer.domElement);
 // controls.autoRotate = true;
 
+// RAYCASTER
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+function onMouseMove(event) {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+}
+window.addEventListener("mousemove", onMouseMove, false);
+
 //LIGHTS
-const light1 = new THREE.AmbientLight(0xffffff, 0.5);
+const light1 = new THREE.AmbientLight(0xffffff, 0.8);
 const light2 = new THREE.PointLight(0xffffff, 1);
 
 scene.add(light1);
@@ -48,47 +60,37 @@ scene.add(light2);
 //OBJECT
 const obj = new OBJLoader();
 const mtl = new MTLLoader();
-let main;
-let circle;
+let squares = [];
 let x = 0;
-let y = -2;
+let z = -2;
 for (let i = 0; i < 9; i++) {
   const geometry = new THREE.BoxGeometry(20, 5, 20);
-  const material = new THREE.MeshDepthMaterial(0x111111);
+  const material = new THREE.MeshLambertMaterial({ color: 0xffffff });
   const square = new THREE.Mesh(geometry, material);
+  if (i % 3 === 0) {
+    x = -1;
+    z++;
+  }
   square.rotateX(Math.PI / 1);
   square.rotateY(Math.PI / 2);
-  if (i === 4) {
-    main = square;
-    scene.add(main);
-  } else {
-    if (i % 3 === 0) {
-      x = -1;
-      y++;
-    }
-    square.position.set(23 * x, 0, 23 * y);
-    scene.add(square);
-  }
+  square.position.set(23 * x, 0, 23 * z);
+  squares.push(square);
+  scene.add(squares[i]);
   x++;
 }
-
-// mtl.load("circle.mtl", (materials) => {
-//   materials.preload();
-//   obj.setMaterials(materials).load("circle.obj", (object) => {
-//     object.scale.set(0.2, 0.2, 0.2);
-//     object.rotateX(Math.PI / 2);
-//     circle = object;
-//     scene.add(circle);
-//   });
-// });
 
 //RENDER LOOP
 requestAnimationFrame(render);
 function render() {
-  // if (circle) {
-  //   circle.rotation.x += 0.01;
-  //   circle.rotation.y += 0.03;
-  // }
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(scene.children);
+  squares.forEach((sqrt) => (sqrt.material.color = new THREE.Color(0xffffff)));
+  if (intersects.length > 0) {
+    let aux = squares.filter((sqr) => sqr.id === intersects[0].object.id);
+    if (aux.length > 0) {
+      aux[0].material.color = new THREE.Color(0xe10040);
+    }
+  }
   controls.update();
   renderer.render(scene, camera);
   requestAnimationFrame(render);
