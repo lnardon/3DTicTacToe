@@ -24,8 +24,8 @@ const camera = new THREE.PerspectiveCamera(
   3000
 );
 camera.position.x = 50;
-camera.position.y = 50;
-camera.position.z = 75;
+camera.position.y = 75;
+camera.position.z = 50;
 
 window.addEventListener(
   "resize",
@@ -48,24 +48,45 @@ function onMouseMove(event) {
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
+function onClick() {
+  const intersects = raycaster.intersectObjects(scene.children);
+  if (intersects.length > 0) {
+    let aux = squares.filter((sqr) => sqr.id === intersects[0].object.id);
+    if (aux.length > 0) {
+      if (!aux[0].inUse) {
+        aux[0].inUse = true;
+        aux[0].player = currentPlayer;
+        if (currentPlayer) {
+          aux[0].material.color = new THREE.Color(0xe10040);
+        } else {
+          aux[0].material.color = new THREE.Color(0x00eee1);
+        }
+        currentPlayer = !currentPlayer;
+        document.getElementsByClassName(
+          "player"
+        )[0].innerText = `Current Player: ${currentPlayer ? "Red" : "Blue"}`;
+      }
+    }
+  }
+}
 window.addEventListener("mousemove", onMouseMove, false);
+window.addEventListener("click", onClick, false);
 
 //LIGHTS
-const light1 = new THREE.AmbientLight(0xffffff, 0.8);
+const light1 = new THREE.AmbientLight(0xffffff, 0.5);
 const light2 = new THREE.PointLight(0xffffff, 1);
+light2.position.set(0, 7, 0);
 
 scene.add(light1);
 scene.add(light2);
 
 //OBJECT
-const obj = new OBJLoader();
-const mtl = new MTLLoader();
 let squares = [];
 let x = 0;
 let z = -2;
 for (let i = 0; i < 9; i++) {
   const geometry = new THREE.BoxGeometry(20, 5, 20);
-  const material = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  const material = new THREE.MeshLambertMaterial({ color: 0xfafafa });
   const square = new THREE.Mesh(geometry, material);
   if (i % 3 === 0) {
     x = -1;
@@ -73,22 +94,28 @@ for (let i = 0; i < 9; i++) {
   }
   square.rotateX(Math.PI / 1);
   square.rotateY(Math.PI / 2);
-  square.position.set(23 * x, 0, 23 * z);
+  square.position.set(23 * x, -10, 23 * z);
+  square.inUse = false;
   squares.push(square);
   scene.add(squares[i]);
   x++;
 }
 
 //RENDER LOOP
+let currentPlayer = true;
 requestAnimationFrame(render);
 function render() {
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(scene.children);
-  squares.forEach((sqrt) => (sqrt.material.color = new THREE.Color(0xffffff)));
+  squares.forEach((sqrt) =>
+    sqrt.inUse === false
+      ? (sqrt.material.color = new THREE.Color(0xe1e1e1))
+      : null
+  );
   if (intersects.length > 0) {
     let aux = squares.filter((sqr) => sqr.id === intersects[0].object.id);
     if (aux.length > 0) {
-      aux[0].material.color = new THREE.Color(0xe10040);
+      aux[0].inUse ? null : (aux[0].material.color = new THREE.Color(0x313131));
     }
   }
   controls.update();
