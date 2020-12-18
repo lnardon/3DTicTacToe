@@ -62,7 +62,7 @@ function onClick() {
           aux[0].material.color = new THREE.Color(0x00eee1);
         }
         let result = checkForWinner();
-        if (result) {
+        if (result !== "NO") {
           alert(`The winner is: ${result ? "Red" : "Blue"}`);
           createGame();
         } else {
@@ -158,6 +158,8 @@ function checkForWinner() {
 
   if (winner !== null) {
     return winner.player;
+  } else {
+    return "NO";
   }
 }
 
