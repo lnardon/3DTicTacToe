@@ -27,7 +27,17 @@ body {
 
 .player {
   position: absolute;
-  margin-top: 12rem;
+  margin-top: 7rem;
   font-size: 2rem;
   color: #dbdbdb;
+}
+
+#github {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+}
+
+#github > img {
+  width: 225px;
 }

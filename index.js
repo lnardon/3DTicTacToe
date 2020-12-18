@@ -64,6 +64,7 @@ function onClick() {
         let result = checkForWinner();
         if (result !== "NO") {
           alert(`The winner is: ${result ? "Red" : "Blue"}`);
+          squares.forEach((sqrt) => scene.remove(sqrt));
           createGame();
         } else {
           currentPlayer = !currentPlayer;
@@ -79,9 +80,20 @@ window.addEventListener("mousemove", onMouseMove, false);
 window.addEventListener("click", onClick, false);
 
 //LIGHTS
-const light1 = new THREE.AmbientLight(0xffffff, 0.5);
-const light2 = new THREE.PointLight(0xffffff, 1);
-light2.position.set(0, 7, 0);
+const light1 = new THREE.AmbientLight(0xfffaff, 0.7);
+const light2 = new THREE.SpotLight(0xfffaaf, 1);
+light2.position.set(-40, 20, 0);
+light2.castShadow = true;
+light2.shadow.mapSize.width = 1024;
+light2.shadow.mapSize.height = 1024;
+light2.shadow.camera.near = 0.1;
+light2.shadow.camera.far = 3000;
+light2.shadow.camera.fov = 70;
+light2.angle = -Math.PI / 4;
+light2.penumbra = 1;
+light2.decay = 0;
+light2.distance = 3000;
+light2.rotation.z = Math.PI / 2;
 
 scene.add(light1);
 scene.add(light2);
@@ -89,7 +101,6 @@ scene.add(light2);
 //RENDER LOOP
 let currentPlayer = true;
 let squares = [];
-requestAnimationFrame(render);
 function render() {
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(scene.children);
@@ -111,6 +122,7 @@ function render() {
 
 // Helpers
 function createGame() {
+  requestAnimationFrame(render);
   squares = [];
   let x = 0;
   let z = -2;
