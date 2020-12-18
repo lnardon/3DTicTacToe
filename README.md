@@ -2,9 +2,9 @@
 
 An online 3d tic-tac-toe game using Three.js
 
-<!-- <p align="center">
+<p align="center">
   <img src="./demo.gif">
-</p> -->
+</p> 
 
 ## [Access website here](https://lnardon.github.io/3DTicTacToe/ "Homepage")
 
