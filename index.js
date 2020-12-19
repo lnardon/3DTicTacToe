@@ -63,7 +63,13 @@ function onClick() {
         }
         let result = checkForWinner();
         if (result !== "NO") {
-          alert(`The winner is: ${result ? "Red" : "Blue"}`);
+          let ref;
+          if (result) {
+            ref = document.getElementById("player1");
+          } else {
+            ref = document.getElementById("player2");
+          }
+          ref.innerText = parseInt(ref.innerText) + 1;
           squares.forEach((sqrt) => scene.remove(sqrt));
           createGame();
         } else {
