@@ -118,7 +118,11 @@ function render() {
   if (intersects.length > 0) {
     let aux = squares.filter((sqr) => sqr.id === intersects[0].object.id);
     if (aux.length > 0) {
-      aux[0].inUse ? null : (aux[0].material.color = new THREE.Color(0x313131));
+      aux[0].inUse
+        ? null
+        : currentPlayer
+        ? (aux[0].material.color = new THREE.Color(0xda9dae))
+        : (aux[0].material.color = new THREE.Color(0x9be5e2));
     }
   }
   controls.update();
