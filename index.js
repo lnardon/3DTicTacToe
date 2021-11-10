@@ -1,8 +1,6 @@
 // IMPORTS
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js";
-import { OBJLoader } from "https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/loaders/OBJLoader.js";
-import { MTLLoader } from "https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/loaders/MTLLoader.js";
 
 //SCENE
 const scene = new THREE.Scene();
@@ -39,7 +37,6 @@ window.addEventListener(
 
 // CONTROLS
 const controls = new OrbitControls(camera, renderer.domElement);
-// controls.autoRotate = true;
 
 // RAYCASTER
 const raycaster = new THREE.Raycaster();
@@ -48,47 +45,52 @@ function onMouseMove(event) {
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
-function onClick() {
-  const intersects = raycaster.intersectObjects(scene.children);
-  if (intersects.length > 0) {
-    let aux = squares.filter((sqr) => sqr.id === intersects[0].object.id);
-    if (aux.length > 0) {
-      if (!aux[0].inUse) {
-        aux[0].inUse = true;
-        aux[0].player = currentPlayer;
-        if (currentPlayer) {
-          aux[0].material.color = new THREE.Color(0xe10040);
-        } else {
-          aux[0].material.color = new THREE.Color(0x00eee1);
-        }
-        let result = checkForWinner();
-        if (result !== "NO") {
-          let ref;
-          if (result) {
-            ref = document.getElementById("player1");
+
+let preventClickOnDrag = false;
+document.onmousedown = () => {
+  preventClickOnDrag = true;
+};
+document.onmouseup = () => {
+  if (preventClickOnDrag) {
+    const intersects = raycaster.intersectObjects(scene.children);
+    if (intersects.length > 0) {
+      let aux = squares.filter((sqr) => sqr.id === intersects[0].object.id);
+      if (aux.length > 0) {
+        if (!aux[0].inUse) {
+          aux[0].inUse = true;
+          aux[0].player = currentPlayer;
+          if (currentPlayer) {
+            aux[0].material.color = new THREE.Color(0xe10040);
           } else {
-            ref = document.getElementById("player2");
+            aux[0].material.color = new THREE.Color(0x00eee1);
           }
-          ref.innerText = parseInt(ref.innerText) + 1;
-          squares.forEach((sqrt) => scene.remove(sqrt));
-          createGame();
-        } else {
-          currentPlayer = !currentPlayer;
-          document.getElementsByClassName(
-            "player"
-          )[0].innerText = `Current Player: ${currentPlayer ? "Red" : "Blue"}`;
+          const allAvailable = squares.filter((sqr) => sqr.inUse === true);
+          if (allAvailable.length === 9) {
+            createGame();
+            return;
+          }
+          let result = checkForWinner();
+          if (result !== "NO") {
+            let ref;
+            if (result) {
+              ref = document.getElementById("player1");
+            } else {
+              ref = document.getElementById("player2");
+            }
+            ref.innerText = parseInt(ref.innerText) + 1;
+            createGame();
+          } else {
+            currentPlayer = !currentPlayer;
+          }
         }
       }
-        const allAvailable = squares.filter((sqr) => sqr.inUse === true);
-  if(allAvailable.length === 9){
-    createGame();
-    return;
-  }
     }
   }
-}
+};
+document.onmousemove = () => {
+  preventClickOnDrag = false;
+};
 window.addEventListener("mousemove", onMouseMove, false);
-window.addEventListener("click", onClick, false);
 
 //LIGHTS
 const light1 = new THREE.AmbientLight(0xfffaff, 0.7);
@@ -105,7 +107,6 @@ light2.penumbra = 1;
 light2.decay = 0;
 light2.distance = 3000;
 light2.rotation.z = Math.PI / 2;
-
 scene.add(light1);
 scene.add(light2);
 
@@ -138,6 +139,8 @@ function render() {
 // Helpers
 function createGame() {
   requestAnimationFrame(render);
+  squares.forEach((sqrt) => scene.remove(sqrt));
+  currentPlayer = true;
   squares = [];
   let x = 0;
   let z = -2;
