@@ -49,12 +49,6 @@ function onMouseMove(event) {
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
 function onClick() {
-  const allAvailable = squares.filter((sqr) => sqr.inUse === true);
-  if(allAvailable.length === 9){
-    console.log("REMOVE ME")
-    createGame();
-    return;
-  }
   const intersects = raycaster.intersectObjects(scene.children);
   if (intersects.length > 0) {
     let aux = squares.filter((sqr) => sqr.id === intersects[0].object.id);
@@ -85,6 +79,11 @@ function onClick() {
           )[0].innerText = `Current Player: ${currentPlayer ? "Red" : "Blue"}`;
         }
       }
+        const allAvailable = squares.filter((sqr) => sqr.inUse === true);
+  if(allAvailable.length === 9){
+    createGame();
+    return;
+  }
     }
   }
 }
