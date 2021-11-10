@@ -49,7 +49,9 @@ function onMouseMove(event) {
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
 function onClick() {
-  if(squares.filter((sqr) => sqr.inUse === false).length === 0){
+  const allAvailable = squares.filter((sqr) => sqr.inUse === false);
+  if(allAvailable.length === 0){
+    console.log("REMOVE ME")
     createGame();
     return;
   }
