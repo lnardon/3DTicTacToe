@@ -49,6 +49,10 @@ function onMouseMove(event) {
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
 function onClick() {
+  if(squares.filter((sqr) => sqr.inUse === false).length === 0){
+    createGame();
+    return;
+  }
   const intersects = raycaster.intersectObjects(scene.children);
   if (intersects.length > 0) {
     let aux = squares.filter((sqr) => sqr.id === intersects[0].object.id);
